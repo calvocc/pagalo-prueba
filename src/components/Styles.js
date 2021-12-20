@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { NavLink } from 'react-router-dom';
+import Card from 'react-bootstrap/Card';
 
 import * as COLORES from '../constans/Colores';
 
@@ -40,6 +40,21 @@ export const StylesBtnRojo = styled(Button)`
     }
 `
 
+export const StylesBtnAction = styled(Button)`
+    background-color: transparent;
+    color: ${COLORES.TEXTO};
+    border-color: transparent;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
+    &:hover{
+        background-color: ${COLORES.AZULITO};
+        border-color: ${COLORES.AZULITO};
+        color: ${COLORES.BLANCO};
+    }
+`
+
 export const StylesBtnNavBar = styled(Button)`
     background-color: transparent;
     color: ${COLORES.BLANCO};
@@ -49,6 +64,7 @@ export const StylesBtnNavBar = styled(Button)`
     padding-left: 20px;
     padding-right: 20px;
     border-radius: 20px;
+    margin-left: 20px;
     &:hover{
         background-color: ${COLORES.MORADO};
         border-color: ${COLORES.BLANCO  };
@@ -68,6 +84,9 @@ export const StyledFormControl = styled(Form.Control)`
 `
 export const StyledFormSelect = styled(Form.Select)`
     font-size: 12px;
+`
+export const StyledFormText = styled(Form.Text)`
+    color: ${COLORES.ROJO};
 `
 
 export const StyledCajaForm = styled.div`
@@ -103,4 +122,40 @@ export const StylesTituloModal = styled(Modal.Title)`
 export const StylesBodyModal = styled(Modal.Body)`
     font-size: 12px;
     padding: 30px;
+`
+
+export const StyledCard = styled(Card)`
+    margin-bottom: 20px;
+`
+export const StyledCardTitle = styled(Card.Title)`
+    font-size: 16px;
+    color: ${COLORES.AZULITO};
+`
+export const StyledCardTexto = styled(Card.Text)`
+    font-size: 12px;
+    color: ${COLORES.TEXTO};
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    margin-bottom: ${props => props.mbottom || '1rem'};
+    min-height: ${props => props.miheight || '32px'};
+    line-height: 16px; /* fallback */
+    max-height: ${props => props.maheight || '32px'}; /* fallback */
+    -webkit-line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
+`
+
+export const StyledContainerSpin = styled.div`
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: ${COLORES.BLANCO};
+    padding-top: 50px;
 `

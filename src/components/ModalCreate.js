@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,8 +8,9 @@ import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 import { useForm, Controller } from "react-hook-form";
 
-import {StylesBtnAzul, StylesBtnRojo, StylesTituloModal, StylesBodyModal, StylesFormGropu, StyledFormControl, StyledFormSelect, StyledCajaForm, StylesForm} from './Styles';
+import {StylesBtnAzul, StylesBtnRojo, StylesTituloModal, StylesBodyModal, StylesFormGropu, StyledFormControl, StyledFormSelect, StyledCajaForm, StylesForm, StyledFormText} from './Styles';
 import * as COLORES from '../constans/Colores';
+import {CATEGORIAS} from '../constans/Utils';
 
 const StyledFooter = styled.footer`
     background-color: ${COLORES.AZULITO};
@@ -26,11 +27,34 @@ const ModalCreateComponent = ({
     show,
     handleClose,
     title,
-    onSubmit
+    onSubmit,
+    cargando,
+    action,
+    itemSelect
 }) => {
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm();
-    const [cargando, setCargando] = useState(false);
+    const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm();
+
+    useEffect(() => {
+        if(itemSelect){
+            reset({
+                nombre: itemSelect.nombre,
+                categoria: itemSelect.categoria,
+                cantidad: itemSelect.cantidad,
+                valor: itemSelect.valor,
+                descripcion: itemSelect.descripcion,
+            })
+        }
+        if(!itemSelect){
+            reset({
+                nombre: '',
+                categoria: '',
+                cantidad: '',
+                valor: '',
+                descripcion: '',
+            })
+        }
+    }, [action])
 
     return (
         <Modal show={show} onHide={handleClose} size="lg">
@@ -39,7 +63,7 @@ const ModalCreateComponent = ({
             </Modal.Header>
 
             <StylesBodyModal>
-                <StylesForm onSubmit={handleSubmit(onSubmit)}>
+                <StylesForm>
                     <Row>
                         <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                             <StylesFormGropu >
@@ -59,14 +83,14 @@ const ModalCreateComponent = ({
                                         />
                                     )}
                                 />
-                                {errors.nombre && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.nombre && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
                         </Col>
                         <Col xs={12} sm={6} md={6} lg={6} xl={6}>
                             <StylesFormGropu>
                                 <Form.Label>Categoria</Form.Label>
                                 <Controller
-                                    name="rol"
+                                    name="categoria"
                                     control={control}
                                     rules={{ required: true }}
                                     defaultValue=""
@@ -78,12 +102,13 @@ const ModalCreateComponent = ({
                                             value={value}
                                         >
                                             <option>Seleccione una categoria</option>
-                                            <option value="1">Administrador</option>
-                                            <option value="2">Usuario</option>
+                                            {CATEGORIAS.map( ({value, label}) => (
+                                                <option key={value} value={value}>{label}</option>
+                                            ))}
                                         </StyledFormSelect>
                                     )}
                                 />
-                                {errors.rol && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.categoria && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
                         </Col>
                         <Col xs={12} sm={6} md={6} lg={6} xl={6}>
@@ -96,15 +121,16 @@ const ModalCreateComponent = ({
                                     defaultValue=""
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <StyledFormControl
-                                            type="text"
-                                            placeholder="Apellido" 
+                                            type="number"
+                                            placeholder="Cantidad" 
+                                            min="0"
                                             onBlur={onBlur}
                                             onChange={value => onChange(value)}
                                             value={value}
                                         />
                                     )}
                                 />
-                                {errors.apellido && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.cantidad && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
                         </Col>
                         <Col xs={12} sm={6} md={6} lg={6} xl={6}>
@@ -117,7 +143,7 @@ const ModalCreateComponent = ({
                                     defaultValue=""
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <StyledFormControl
-                                            type="text"
+                                            type="number"
                                             placeholder="Valor" 
                                             onBlur={onBlur}
                                             onChange={value => onChange(value)}
@@ -125,7 +151,7 @@ const ModalCreateComponent = ({
                                         />
                                     )}
                                 />
-                                {errors.apellido && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.valor && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
                         </Col>
                         <Col xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -146,7 +172,7 @@ const ModalCreateComponent = ({
                                         />
                                     )}
                                 />
-                                {errors.apellido && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.descripcion && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
                         </Col>
                     </Row>
@@ -154,9 +180,9 @@ const ModalCreateComponent = ({
             </StylesBodyModal>
 
             <Modal.Footer>
-                <StylesBtnRojo variant="secondary">Cancelar</StylesBtnRojo>
-                <StylesBtnAzul variant="primary" type="submit" disabled={cargando}>
-                    {cargando ? <Spinner animation="border" variant="light"/> : 'Crear producto'}
+                <StylesBtnRojo variant="secondary" onClick={handleClose}>Cancelar</StylesBtnRojo>
+                <StylesBtnAzul variant="primary" disabled={cargando} onClick={handleSubmit(onSubmit)}>
+                    {cargando ? <Spinner animation="border" variant="light"/> : `${action === 1 ? 'Crear' : 'Editar'} producto`}
                 </StylesBtnAzul>
             </Modal.Footer>
         </Modal>

@@ -8,7 +8,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import { useForm, Controller } from "react-hook-form";
 
 import AuthContex from '../../context/autenticacion/AuthContex';
-import {StylesTitulo, StylesBtnAzul, StylesFormGropu, StyledFormControl, StyledFormSelect, StyledCajaForm, StylesForm} from '../../components/Styles';
+import {StylesTitulo, StylesBtnAzul, StylesFormGropu, StyledFormControl, StyledFormSelect, StyledCajaForm, StylesForm, StyledFormText} from '../../components/Styles';
 
 const RegistroPage = (props) => {
     const authContext = useContext(AuthContex);
@@ -51,7 +51,7 @@ const RegistroPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.nombre && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.nombre && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesFormGropu>
@@ -71,7 +71,7 @@ const RegistroPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.apellido && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.apellido && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesFormGropu>
@@ -94,7 +94,7 @@ const RegistroPage = (props) => {
                                         </StyledFormSelect>
                                     )}
                                 />
-                                {errors.rol && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.rol && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesFormGropu>
@@ -120,7 +120,7 @@ const RegistroPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.email && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.email && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesFormGropu>
@@ -141,7 +141,7 @@ const RegistroPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.password && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.password && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesBtnAzul variant="primary" type="submit" disabled={cargando}>

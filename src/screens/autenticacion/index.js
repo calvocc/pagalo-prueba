@@ -9,7 +9,7 @@ import Form from 'react-bootstrap/Form';
 
 import AuthContex from '../../context/autenticacion/AuthContex';
 import * as ROUTES from "../../constans/Rutas";
-import {StylesTitulo, StylesBtnAzul, StylesFormGropu, StyledFormControl, StyledCajaForm, StylesForm} from '../../components/Styles';
+import {StylesTitulo, StylesBtnAzul, StylesFormGropu, StyledFormControl, StyledCajaForm, StylesForm, StyledFormText} from '../../components/Styles';
 
 const LoginPage = (props) => {
     const authContext = useContext(AuthContex);
@@ -75,7 +75,7 @@ const LoginPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.email && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.email && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesFormGropu>
@@ -96,7 +96,7 @@ const LoginPage = (props) => {
                                         />
                                     )}
                                 />
-                                {errors.password && <Form.Text id="passwordHelpBlock" className="error">El campo es obligatorio</Form.Text>}
+                                {errors.password && <StyledFormText id="passwordHelpBlock" className="error">El campo es obligatorio</StyledFormText>}
                             </StylesFormGropu>
 
                             <StylesBtnAzul variant="primary" type="submit" disabled={cargando}>

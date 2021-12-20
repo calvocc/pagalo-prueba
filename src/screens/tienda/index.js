@@ -1,118 +1,107 @@
-import React, {useState, useContext, useEffect} from 'react';
-import {Link} from 'react-router-dom';
+import React, {useState, useContext, useEffect, useRef} from 'react';
+import {useLocation} from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Alert from 'react-bootstrap/Alert';
+import Spinner from 'react-bootstrap/Spinner';
+import Card from 'react-bootstrap/Card';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { run as runHolder } from 'holderjs/holder';
 
 import AuthContex from '../../context/autenticacion/AuthContex';
+import {StylesTitulo, StylesBtnAzul, StyledCaja, StyledFormControl, StyledCard, StyledCardTitle, StyledCardTexto, StyledContainerSpin} from '../../components/Styles';
+import { db } from '../../firebase';
 
-const TiendaPage = (props) => {
-    const authContext = useContext(AuthContex);
-    const { mensaje, autenticado, registrarUsuario } = authContext;
+const TiendaPage = () => {
+    const location = useLocation();
 
-    const [nombre, setNombre] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmar, setConfirmar] = useState('');
+    const querytab = new URLSearchParams(location.search);
+    const refCurrenTab = useRef(querytab.get('tab') ? querytab.get('tab') : 'todos')
+
+    const [loading, setLoading] = useState(false);
+    const [items, setItems] = useState(null);
+    const [itemsF, setItemsF] = useState(null);
+	const [buscar, setBuscar] = useState()
+
+    const myImage = document.getElementById('myImage');
 
     useEffect(() => {
-        if(mensaje){
-            console.log(mensaje)
+        runHolder('image-class-name');
+    });
+
+    useEffect(() => {
+        const querytab = new URLSearchParams(location.search);
+        const curretTab = querytab.get('tab') ? querytab.get('tab') : 'todos';
+        refCurrenTab.current = curretTab;
+        consultarItems(curretTab);
+    }, [location.search]);
+
+    const consultarItems = async (curretTab) => {
+        setLoading(true);
+        try {
+            const ProductosRef = collection(db, "Productos");
+            const q = curretTab === 'todos' ? query(ProductosRef) :  query(ProductosRef, where("categoria", "==", curretTab));
+            const querySnapshot = await getDocs(q);
+            const items = [];
+            querySnapshot.forEach((doc) => {
+                items.push(doc.data());
+            });
+            setItems(items.length > 0 ? items : null);
+            setItemsF(items.length > 0 ? items : null);
+        } catch (error) {
+            console.log(error)
+        } finally{
+            setLoading(false)
         }
-    },[mensaje, autenticado, props.history]);
-
-    const onSubmit = e => {
-        e.preventDefault();
-
-        // validar que no hayan campos vacios
-        if(nombre.trim() === '' || email.trim() === '' || password.trim() === '' || confirmar.trim() === '' ){
-            console.log('Todos los campos son obligatorios');
-            return;
-        }
-
-        //paswor minimo 6 caracteres
-        if(password.length < 6){
-            console.log('La contraseña debe tener minimo 6 caracteres');
-            return;
-        }
-
-        // pasword y confirmar no son iguales
-        if(password !== confirmar){
-            console.log('Las contraseñas no son iguales');
-            return;
-        }
-
-        registrarUsuario({
-            nombre,
-            email,
-            password
-        });
     }
+
+    const buscador = (e) => {
+		const busqueda = e.target.value;
+		const array = items;
+		const filtrados = array.filter( (item) =>
+			(item.nombre && item.nombre.toString().toLowerCase().search(busqueda.toLowerCase()) > -1) || 
+			(item.categoria && item.categoria.toLowerCase().search(busqueda.toLowerCase()) > -1) ||
+			(item.cantidad && item.cantidad.toString().toLowerCase().search(busqueda.toLowerCase()) > -1) || 
+			(item.descripcion && item.descripcion.toString().search(busqueda.toLowerCase()) > -1) || 
+			(item.valor && item.valor.toString().toLowerCase().search(busqueda.toLowerCase()) > -1)
+		)
+		setItemsF(filtrados)
+	}
 
     return (
         <Container>
             <Row className="justify-content-center">
-                <Col xs={12} sm={6} md={6} lg={6} xl={6}>
-                    
-                    <div className="form-usuario">
-                        <h1>Iniciar sesion</h1>
-
-                        <Form onSubmit={onSubmit}>
-                            <Form.Group controlId="formBasicEmail">
-                                <Form.Label>Nombre</Form.Label>
-                                <Form.Control 
+                <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <StyledCaja mtop="0px">
+                        <StylesTitulo>Tienda de empleados Todo 1</StylesTitulo>
+                        <Row className="justify-content-between">
+                            <Col xs={8} sm={4} md={4} lg={4} xl={4}>
+                                <StyledFormControl
                                     type="text"
-                                    value={nombre}
-                                    placeholder="Nombre" 
-                                    onChange={(e) => setNombre(e.target.value)}
+                                    placeholder="Buscar producto..."
+                                    value={buscar}
+                                    onChange={buscador}
                                 />
-                                <Form.Text className="text-muted">
-                                We'll never share your email with anyone else.
-                                </Form.Text>
-                            </Form.Group>
-
-                            <Form.Group controlId="formBasicEmail">
-                                <Form.Label>Email address</Form.Label>
-                                <Form.Control 
-                                    type="email"
-                                    value={email}
-                                    placeholder="Enter email" 
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                                <Form.Text className="text-muted">
-                                We'll never share your email with anyone else.
-                                </Form.Text>
-                            </Form.Group>
-
-                            <Form.Group controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
-                                    value={password}
-                                    placeholder="Password" 
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                            </Form.Group>
-
-                            <Form.Group controlId="formBasicPassword">
-                                <Form.Label>Confirmar Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
-                                    value={confirmar}
-                                    placeholder="Password" 
-                                    onChange={(e) => setConfirmar(e.target.value)}
-                                />
-                            </Form.Group>
-
-                            <Button variant="primary" type="submit">
-                                Submit
-                            </Button>
-                        </Form>
-                        <Link to="/perfil" className="btn btn-link"> Perfil </Link>
-                    </div>
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-start mt-4 position-relative">
+                            { loading && <StyledContainerSpin><Spinner animation="border" variant="info"/></StyledContainerSpin> }
+                            {itemsF ? itemsF.map( (item) => (
+                                <Col xs={12} sm={4} md={4} lg={3} xl={3} key={item.uid}>
+                                    <StyledCard>
+                                        <Card.Img variant="top" src="holder.js/100px170" />
+                                        <Card.Body>
+                                            <StyledCardTitle>{item.nombre}</StyledCardTitle>
+                                            <StyledCardTexto miheight="16px" maheight="16px" mbottom="10px">Categoria: <strong>{item.categoria}</strong></StyledCardTexto>
+                                            <StyledCardTexto>{item.descripcion}</StyledCardTexto>
+                                            <StylesBtnAzul variant="primary">Comprar</StylesBtnAzul>
+                                        </Card.Body>
+                                    </StyledCard>
+                                </Col>
+                            )) : <div>No hay productos en stock</div>
+                            }
+                        </Row>
+                    </StyledCaja>
                 </Col>
             </Row>
         </Container>
