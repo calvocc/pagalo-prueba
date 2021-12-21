@@ -8,10 +8,12 @@ import LoginPage from "./screens/autenticacion";
 import RegistroPage from "./screens/autenticacion/registro";
 import TiendaPage from "./screens/tienda";
 import InventarioPage from "./screens/inventario";
+import CarPage from './screens/tienda/car';
 
 import * as ROUTES from "./constans/Rutas";
 
 import AuthState from "./context/autenticacion/AuthState";
+import CompraState from "./context/compras/CompraState";
 import RutaPrivada from "./components/RutaPrivada";
 import HeaderComponent from "./components/Header";
 import FooterComponen from "./components/Footer";
@@ -22,15 +24,18 @@ function App() {
 		<Fragment>
 			<Router>
 				<AuthState>
-					<HeaderComponent />
-					<Routes>
-						<Route exact path={ROUTES.LOGIN} element={<LoginPage />} />
-						<Route exact path={ROUTES.REGISTRO} element={<RegistroPage />} />
-						<Route exact path='/' element={<RutaPrivada/>}>
-							<Route exact path={ROUTES.INVENTARIO} element={<InventarioPage/>}/>
-							<Route exact path={ROUTES.HOME} element={<TiendaPage/>}/>
-						</Route>
-					</Routes>
+					<CompraState>
+						<HeaderComponent />
+						<Routes>
+							<Route exact path={ROUTES.LOGIN} element={<LoginPage />} />
+							<Route exact path={ROUTES.REGISTRO} element={<RegistroPage />} />
+							<Route exact path='/' element={<RutaPrivada/>}>
+								<Route exact path={ROUTES.INVENTARIO} element={<InventarioPage/>}/>
+								<Route exact path={ROUTES.HOME} element={<TiendaPage/>}/>
+								<Route exact path={ROUTES.CARITO} element={<CarPage />} />
+							</Route>
+						</Routes>
+					</CompraState>
 					<FooterComponen />
 				</AuthState>
 			</Router>

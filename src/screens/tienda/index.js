@@ -8,12 +8,14 @@ import Card from 'react-bootstrap/Card';
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { run as runHolder } from 'holderjs/holder';
 
-import AuthContex from '../../context/autenticacion/AuthContex';
+import CompraContext from '../../context/compras/CompraContext';
 import {StylesTitulo, StylesBtnAzul, StyledCaja, StyledFormControl, StyledCard, StyledCardTitle, StyledCardTexto, StyledContainerSpin} from '../../components/Styles';
 import { db } from '../../firebase';
 
 const TiendaPage = () => {
     const location = useLocation();
+    const compraContext = useContext(CompraContext);
+    const { cargandocar, addCart } = compraContext;
 
     const querytab = new URLSearchParams(location.search);
     const refCurrenTab = useRef(querytab.get('tab') ? querytab.get('tab') : 'todos')
@@ -68,6 +70,10 @@ const TiendaPage = () => {
 		setItemsF(filtrados)
 	}
 
+    const agregarItem = (item) =>{
+        addCart(item);
+    }
+
     return (
         <Container>
             <Row className="justify-content-center">
@@ -94,7 +100,9 @@ const TiendaPage = () => {
                                             <StyledCardTitle>{item.nombre}</StyledCardTitle>
                                             <StyledCardTexto miheight="16px" maheight="16px" mbottom="10px">Categoria: <strong>{item.categoria}</strong></StyledCardTexto>
                                             <StyledCardTexto>{item.descripcion}</StyledCardTexto>
-                                            <StylesBtnAzul variant="primary">Comprar</StylesBtnAzul>
+                                            <StylesBtnAzul className="block" onClick={() => agregarItem(item)} disabled={cargandocar || item.cantidad <= 0}>
+                                                {cargandocar ? <Spinner animation="border" variant="light"/> : item.cantidad <= 0 ? 'No hay stock' : 'Agregar al carrito'}
+                                            </StylesBtnAzul>
                                         </Card.Body>
                                     </StyledCard>
                                 </Col>

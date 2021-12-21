@@ -13,14 +13,14 @@ import { FiEdit2, FiSun, FiMoon } from 'react-icons/fi';
 import { collection, doc, setDoc, onSnapshot, query, updateDoc, orderBy } from "firebase/firestore";
 
 import AuthContex from '../../context/autenticacion/AuthContex';
-import {StylesTitulo, StylesBtnAzul, StyledCaja, StyledFormControl, StyledCajaTabla, StylesBtnAction} from '../../components/Styles';
+import {StylesTitulo, StylesBtnAzul, StyledCaja, StyledFormControl, StyledCajaTabla, StylesBtnAction, StyleProhibido} from '../../components/Styles';
 import { db } from '../../firebase';
 
 import ModalCreateComponent from '../../components/ModalCreate';
 
 const InventarioPage = () => {
-    const authContext = useContext(AuthContex);
-    const { cargando } = authContext;
+    const authContex = useContext(AuthContex);
+    const { usuario, cargando } = authContex;
 
     const [modalShow, setModalShow] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -28,9 +28,15 @@ const InventarioPage = () => {
     const [itemsF, setItemsF] = useState(null);
     const [action, setAction] = useState(null);
     const [itemSelect, setItemSelect] = useState(null);
+    const [errorUser, setErrorUser] = useState(null);
 	const [buscar, setBuscar] = useState()
 
     useEffect(() => {
+        if(usuario?.rol !== '1'){
+            setErrorUser(true);
+            return
+        }
+
         const q = query(collection(db, "Productos"));
         const unsub = onSnapshot(q, (querySnapshot) => {
             const items = [];
@@ -43,6 +49,9 @@ const InventarioPage = () => {
         return () => {
             unsub()
         }
+    }, [usuario])
+
+    useEffect(() => {
     }, []);
 
     const onSubmit = async(data) => {
@@ -50,7 +59,7 @@ const InventarioPage = () => {
         try {
             if(action === 1){
                 const newCityRef = doc(collection(db, "Productos"));
-                await setDoc(newCityRef, {...data, estado: true, uid: newCityRef.id});
+                await setDoc(newCityRef, {...data, cantidad: parseInt(data.cantidad), estado: true, uid: newCityRef.id});
             } 
             if(action === 2){
                 const updateRef = doc(db, "Productos", itemSelect.uid);
@@ -66,18 +75,6 @@ const InventarioPage = () => {
             setLoading(false);
             setModalShow(false);
             setItemSelect(null);
-        }
-    }
-
-    const cambiarEstado = async (item) => {
-        try {
-            const updateRef = doc(db, "Productos", item.uid);
-            await updateDoc(updateRef, {
-                estado: !item.estado
-            });
-            toast.success("Estado modificado exitosamente...");
-        } catch (error) {
-            toast.error("Algo salio mal intentealo nuevamente...");
         }
     }
 
@@ -104,81 +101,77 @@ const InventarioPage = () => {
         <Container>
             <Row className="justify-content-center">
                 <Col xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <StyledCaja mtop="0px">
-                        <StylesTitulo>Inventario</StylesTitulo>
+                    { errorUser ?
+                        <StyleProhibido>
+                            <h2>Lo siento.<br/>No tienes permisos para acceder a esta pantalla</h2>
+                        </StyleProhibido>
+                        :
+                        <StyledCaja mtop="0px">
+                            <StylesTitulo>Inventario</StylesTitulo>
 
-                        <Row className="justify-content-between">
-                            <Col xs={8} sm={4} md={4} lg={4} xl={4}>
-                                <StyledFormControl
-                                    type="text"
-                                    placeholder="Buscar..."
-                                    value={buscar}
-                                    onChange={buscador}
-                                />
-                            </Col>
-                            <Col xs={4} sm={8} md={8} lg={8} xl={8} className="d-flex justify-content-end align-content-end">
-                                <StylesBtnAzul variant="primary" onClick={ ()=> {setModalShow(true); setAction(1)}}>
-                                    {cargando ? <Spinner animation="border" variant="light"/> : 'Crear Producto'}
-                                </StylesBtnAzul>
-                            </Col>
-                        </Row>
-                        <StyledCajaTabla>
-                            <Table striped bordered hover responsive>
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Nombre</th>
-                                        <th>Categoria</th>
-                                        <th>Cantidad</th>
-                                        <th>Valor</th>
-                                        <th>Descripción</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {itemsF ? itemsF.map( (item, index) => {
-                                        return(
-                                            <tr key={item.uid}>
-                                                <td>{index + 1}</td>
-                                                <td>{item.nombre}</td>
-                                                <td>{item.categoria}</td>
-                                                <td>{item.cantidad}</td>
-                                                <td>{new Intl.NumberFormat("es-CO").format(item.valor)}</td>
-                                                <td>{item.descripcion}</td>
-                                                <td>
-                                                    <ButtonGroup aria-label="Basic example">
-                                                        <OverlayTrigger
-                                                            placement='top'
-                                                            overlay={
-                                                                <Tooltip>
-                                                                    Editar producto
-                                                                </Tooltip>
-                                                            }
-                                                        >
-                                                            <StylesBtnAction variant="secondary" onClick={ () => editarItem(item)}><FiEdit2 /></StylesBtnAction>
-                                                        </OverlayTrigger>
-                                                        <OverlayTrigger
-                                                            placement='top'
-                                                            overlay={
-                                                                <Tooltip>
-                                                                    {item.estado ? 'Desactivar producto' : 'Activar producto'}
-                                                                </Tooltip>
-                                                            }
-                                                        >
-                                                            <StylesBtnAction variant="secondary" onClick={()=>cambiarEstado(item)}>{item.estado ? <FiMoon/> : <FiSun/>}</StylesBtnAction>
-                                                        </OverlayTrigger>
+                            <Row className="justify-content-between">
+                                <Col xs={8} sm={4} md={4} lg={4} xl={4}>
+                                    <StyledFormControl
+                                        type="text"
+                                        placeholder="Buscar..."
+                                        value={buscar}
+                                        onChange={buscador}
+                                    />
+                                </Col>
+                                <Col xs={4} sm={8} md={8} lg={8} xl={8} className="d-flex justify-content-end align-content-end">
+                                    <StylesBtnAzul variant="primary" onClick={ ()=> {setModalShow(true); setAction(1)}}>
+                                        {cargando ? <Spinner animation="border" variant="light"/> : 'Crear Producto'}
+                                    </StylesBtnAzul>
+                                </Col>
+                            </Row>
+                            <StyledCajaTabla>
+                                <Table striped bordered hover responsive>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Nombre</th>
+                                            <th>Categoria</th>
+                                            <th>Cantidad</th>
+                                            <th>Valor</th>
+                                            <th>Descripción</th>
+                                            <th width={30}>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {itemsF ? itemsF.map( (item, index) => {
+                                            return(
+                                                <tr key={item.uid}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{item.nombre}</td>
+                                                    <td>{item.categoria}</td>
+                                                    <td>{item.cantidad}</td>
+                                                    <td>{new Intl.NumberFormat("es-CO").format(item.valor)}</td>
+                                                    <td>{item.descripcion}</td>
+                                                    <td>
+                                                        <ButtonGroup aria-label="Basic example">
+                                                            <OverlayTrigger
+                                                                placement='top'
+                                                                overlay={
+                                                                    <Tooltip>
+                                                                        Editar producto
+                                                                    </Tooltip>
+                                                                }
+                                                            >
+                                                                <StylesBtnAction variant="secondary" onClick={ () => editarItem(item)}><FiEdit2 /></StylesBtnAction>
+                                                            </OverlayTrigger>
+                                                            
+                                                        </ButtonGroup>
                                                         
-                                                    </ButtonGroup>
-                                                    
-                                                </td>
-                                            </tr>
-                                        )
-                                    }) : <tr><td colSpan={7}>No hay datos disponibles</td></tr>}
-                                    
-                                </tbody>
-                            </Table>
-                        </StyledCajaTabla>
-                    </StyledCaja>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }) : <tr><td colSpan={7}>No hay datos disponibles</td></tr>}
+                                        
+                                    </tbody>
+                                </Table>
+                            </StyledCajaTabla>
+                        </StyledCaja>
+                    }
                 </Col>
             </Row>
 

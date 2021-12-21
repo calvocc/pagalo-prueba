@@ -25,6 +25,10 @@ export const StylesBtnAzul = styled(Button)`
         background-color: ${COLORES.MORADO};
         border-color: ${COLORES.MORADO  };
     }
+    &.block{
+        width: 100%;
+        display: block;
+    }
 `
 export const StylesBtnRojo = styled(Button)`
     background-color: ${COLORES.ROJO};
@@ -158,4 +162,23 @@ export const StyledContainerSpin = styled.div`
     align-items: flex-start;
     background-color: ${COLORES.BLANCO};
     padding-top: 50px;
+`
+
+export const StyleProhibido = styled.div`
+    height: 100%;
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+`
+
+export const StyledCartTitle = styled.h3`
+    font-size: 16px;
+    color: ${COLORES.AZULITO};
+    margin-bottom: 0px;
+`
+export const StyledCartTexto = styled.p`
+    font-size: 12px;
+    color: ${COLORES.TEXTO};
+    margin-bottom: 0px;
 `

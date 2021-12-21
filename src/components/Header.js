@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { FiShoppingCart, FiLogOut } from 'react-icons/fi';
 
 import AuthContex from '../context/autenticacion/AuthContex';
+import CompraContext from '../context/compras/CompraContext';
 import * as ROUTES from '../constans/Rutas';
 import * as COLORES from '../constans/Colores';
 import { StylesBtnNavBar } from './Styles';
@@ -15,6 +16,7 @@ import { StylesBtnNavBar } from './Styles';
 import Logo from '../asses/img/logo.png';
 import Logo2x from '../asses/img/logo@2x.png';
 import Logo3x from '../asses/img/logo@3x.png';
+import { CARGANDO } from '../types';
 
 const StyledNavbar = styled(Navbar)`
     background-color: ${COLORES.AZULITO};
@@ -59,7 +61,9 @@ const StyledBadge = styled(Badge)`
 
 const HeaderComponent = () => {
     const authContex = useContext(AuthContex);
+    const compraContext = useContext(CompraContext);
     const { usuario, usuarioAutenticado, cerrarSesion } = authContex;
+    const { carlenght, actializarCart } = compraContext;
     const location = useLocation();
 
     const querytab = new URLSearchParams(location.search);
@@ -68,6 +72,7 @@ const HeaderComponent = () => {
 
 
     useEffect(() => {
+        actializarCart();
         usuarioAutenticado();
     }, [])
 
@@ -130,31 +135,36 @@ const HeaderComponent = () => {
                 </Navbar.Collapse>
                 <Navbar.Collapse className='d-flex justify-content-end align-content-center' id="basic-navbar-nav">
                     <Nav className="mr-auto d-flex align-content-center">
-                        <StylesNavLink  
-                            to={ROUTES.INVENTARIO} >
-                            Inventario
-                        </StylesNavLink> 
-                        <StylesNavLink
-                            to={ROUTES.REGISTRO} >
-                            Registro
-                        </StylesNavLink> 
-                        <StylesNavLink
-                            className="conbadge"
-                            to={ROUTES.REGISTRO} >
-                            <FiShoppingCart />
-                            <StyledBadge pill >1</StyledBadge>
-                        </StylesNavLink> 
-                        
+                        {usuario?.rol === '1' &&
+                            <StylesNavLink  
+                                to={ROUTES.INVENTARIO} >
+                                Inventario
+                            </StylesNavLink> 
+                        }
 
                         {usuario ?
-                            <StylesBtnNavBar
-                                onClick={()=> cerrarSesion()} >
-                                <FiLogOut />
-                            </StylesBtnNavBar>
+                            <>
+                                <StylesNavLink
+                                className="conbadge"
+                                to={ROUTES.CARITO} >
+                                    <FiShoppingCart />
+                                    {carlenght > 0 && <StyledBadge pill >{carlenght}</StyledBadge> }
+                                </StylesNavLink>
+                                <StylesBtnNavBar
+                                    onClick={()=> cerrarSesion()} >
+                                    <FiLogOut />
+                                </StylesBtnNavBar>
+                            </>
                             :
-                            <StylesNavLink to={ROUTES.LOGIN}>
-                                Login
-                            </StylesNavLink>
+                            <>
+                                <StylesNavLink to={ROUTES.LOGIN}>
+                                    Login
+                                </StylesNavLink>
+                                <StylesNavLink
+                                    to={ROUTES.REGISTRO} >
+                                    Registro
+                                </StylesNavLink>
+                            </>
                         }
                     </Nav>
                 </Navbar.Collapse>
